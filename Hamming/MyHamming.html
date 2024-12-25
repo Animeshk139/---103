@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hamming</title> 
+        <script>
+            function EncodeHamming()
+            {
+                let message = document.getElementById('inputData').value;
+                let inputDigits = message.split(''); 
+                for(let i = 0; i < inputDigits.length; i++) //данным циклом меняем элементы массива с string на int
+                {                    
+                    inputDigits[i] = parseInt(inputDigits[i]);
+                }
+                inputDigits.push('*');
+                inputDigits.push('*');
+                inputDigits.splice(3, 0, '*');
+                let arrOf1 = new Object();
+                for (let i = 0; i < inputDigits.length; i++)
+                {
+                    if (inputDigits[i] === 1)
+                    {
+                        arrOf1[7 - i] = (7-i).toString(2).padStart(3, '0');
+                    }
+                }
+                
+                ControlSum = '';
+                for (let i = 0; i < 3; i++)
+                {
+                    cSum = 0
+                    for (let j in arrOf1)
+                    {
+                        //arrof1[j] = 010
+                        cSum += parseInt(arrOf1[j][i]);
+                    }
+                    cSum %= 2;
+                    ControlSum += cSum.toString();
+                }
+                inputDigits[6] = ControlSum[2];
+                inputDigits[5] = ControlSum[1];
+                inputDigits[3] = ControlSum[0];
+                
+
+                
+                document.getElementById('codedData').value = inputDigits.join(''); 
+            }
+            function DecodeHamming()
+            {
+                let s_message = document.getElementById('codedData').value;                     //Берём из coded data выражение и сплитим 
+                let second_message = s_message.split('');
+                for (let i = 0; i < second_message.length; i++)
+                {
+                    second_message[i] = parseInt(second_message[i]);
+                }
+                let arrOf1 = new Object();
+                for (let i = 0; i < second_message.length; i++)
+                {
+                    if (second_message[i] === 1)
+                    {
+                        arrOf1[7 - i] = (7-i).toString(2).padStart(3, '0');
+                    }
+                }
+                ControlSum = '';
+                for (let i = 0; i < 3; i++)
+                {
+                    cSum = 0
+                    for (let j in arrOf1)
+                    {
+                        //arrof1[j] = 010
+                        cSum += parseInt(arrOf1[j][i]);
+                    }
+                    cSum %= 2;screen
+                    ControlSum += cSum.toString();
+                }
+                if (ControlSum === '000')
+                {
+
+                    document.getElementById('decodedData').value = second_message.join('');
+                    document.getElementById('error_info').value = "No error.";
+                }
+                else
+                {
+                    second_message[7 - parseInt(ControlSum, 2)] = (second_message[7 - parseInt(ControlSum, 2)] + 1) % 2;
+                    document.getElementById('decodedData').value = second_message.join('');
+                    document.getElementById('error_info').value = "Error was in " + String(parseInt(ControlSum, 2));
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <h>Hamming code</h>
+        <p> <input type='text' id = 'inputData'/> input data</p>        
+        <p> <input type='button' onclick = 'EncodeHamming()' value='EncodeHamming'/></p>
+        <p> <input type='text' id ='codedData'/> coded data</p>
+        <p> <input type='button' onclick = 'DecodeHamming()' value="DecodeHamming"/> </p>
+        <p> <input type='text'id = 'decodedData'/> decoded data</p>
+        <p> <output id = 'error_info'></p>
+
+    </body>
+</html>
